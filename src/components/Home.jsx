@@ -3,6 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import useLocalStorage from "../hooks/useLocalStorage";
 import Cubicle from "./Cubicle";
+import portfolioImage from "../assets/portfolio.png";
+import profileImage from "../assets/profile.png";
+import coworkersImage from "../assets/coworkers.png";
+
 
 import "./Home.css";
 
@@ -15,7 +19,11 @@ const Home = () => {
     <>
       <div className="home">
         <h1 className="welcome">Welcome back, {userData.username}!</h1>
-        <Cubicle/>
+        <div className="image-container">
+          <img src={portfolioImage} alt="" className="image" />
+          <img src={profileImage} alt="" className="image" />
+          <img src={coworkersImage} alt="" className="image" />
+        </div>
       </div>
     </>
   );
