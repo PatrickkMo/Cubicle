@@ -11,8 +11,7 @@ const Home = () => {
 
   return (
     <div id="home">
-      <Sidebar />
-      <div>Welcome back, {userData.username}!</div>
+      <h1 className="welcome">Welcome back, {userData.username}!</h1>
       <div className="room">
         <Room />
       </div>
