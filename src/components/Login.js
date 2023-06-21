@@ -1,84 +1,133 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import uuid from "react-uuid";
+import cubicleLogo from "../assets/cubicle_logo.png"
 
-import './Login.css';
+import useLocalStorage from "../hooks/useLocalStorage";
+import { fetchValue, saveValue } from "../services/Firebase";
+import { TextField, Button } from "@mui/material";
 
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, get } from 'firebase/database';
+import "./Login.css";
 
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-
-const firebaseConfig = {
-  databaseURL: "https://cubicle-b4654-default-rtdb.asia-southeast1.firebasedatabase.app/",
-};
-
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-
-
-
-
-
-
-
-function Login() {
-
-
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-
+const Login = () => {
+  const { state } = useLocation();
+  const { from } = state || {};
   const navigate = useNavigate();
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
+
+  const handleTogglePage = () => {
+    setIsLogin((prevState) => !prevState);
+  };  
+
   const handleSignIn = async () => {
+    const data = await fetchValue(`users/${username}`);
 
-    const snapshot = await get(ref(database, `USERS/${username}`));
-    const fetchedData = snapshot.val();
-
-
-    if (fetchedData.password.toString() == password) {
-      console.log("Equals")
-      navigate('/charcreate', { state: { username } });
-      
+    if (data && data.password.toString() === password) {
+      const { userId } = data;
+      localStorage.setItem("userData", JSON.stringify({ username, userId }));
+      console.log("login");
+      navigate("/", { replace: true });
     }
-
-
   };
-  
+
+  const handleSignUp = async () => {
+    const dbpath = `users/${username}`;
+    const data = await fetchValue(dbpath);
+    // TODO: Sanitise inputs and throw error if non-alphanumerical
+    if (!data || !data.userId) {
+      const userId = uuid();
+      await saveValue(dbpath, { password, userId });
+      localStorage.setItem("userData", JSON.stringify({ username, userId }));
+      navigate("/", { replace: true });
+      console.log("inv");
+    }
+  }
 
   return (
-    <div className="Login">
-      <h1>Cubicle!</h1>
+    <div className="login_container">
+    <div className="login">
+      <h1>Cubicle</h1>
       <div>
-      <div>
+        <div>
+          <img src={cubicleLogo} alt="" id="cubicle_logo" /> 
+          <h2 className="login_header1">Bridge the Distance <br></br>
+          Revive the Buzz</h2>
+          {/* <h2 className="login_header2">Revive the Buzz</h2> */}
 
+          {isLogin ? (
+          // Render login section
+          <div>
+            <div className="field_container">
+              <TextField
+                id="outlined-basic"
+                label="Username"
+                variant="outlined"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <div className="field_container">
+              <TextField
+                id="outlined-basic"
+                label="Password"
+                variant="outlined"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSignIn()}
+              />
+            </div>
+            <div className="button_container">
+              <Button variant="contained" onClick={handleSignIn}>
+                Login
+              </Button>
+            </div>
+          </div>
+        ) : (
+          // Render signup section
+          <div>
+            <div className="field_container">
+              <TextField
+                id="outlined-basic"
+                label="New Username"
+                variant="outlined"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
 
-
-
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <button onClick={handleSignIn}>Sign In</button>
-                </div>
-              </div>
-
-
+            <div className="field_container">
+              <TextField
+                id="outlined-basic"
+                label="New Password"
+                variant="outlined"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSignUp()}
+              />
+            </div>
+            <div className="button_container">
+              <Button variant="contained" onClick={handleSignUp}>
+                Sign up
+              </Button>
+            </div>
+          </div>
+        )}
+          <div className="button_container">
+            <Button variant="contained" onClick={handleTogglePage}>New here? Click me!</Button>
+          </div>
+        </div>
 
       </div>
     </div>
+    </div>
   );
-}
+};
 
-export default Login;
+export default Login; 
+  
+  
