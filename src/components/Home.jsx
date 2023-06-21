@@ -1,20 +1,21 @@
-import React, { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-
-import useLocalStorage from "../hooks/useLocalStorage";
-import Cubicle from "./Cubicle";
-
 import "./Home.css";
+import React, { useState } from "react";
+import useLocalStorage from "../hooks/useLocalStorage";
+import Room from "./Room";
+import Blur from "./Blur";
+import IconNavBar from "./IconNavBar";
 
 const Home = () => {
-  const { state } = useLocation();
-  const navigate = useNavigate();
-  const [userData, setUserData] = useLocalStorage("userData", {});
+  const [userData] = useLocalStorage("userData", {});
 
   return (
     <>
-      <div>Welcome back, {userData.username}!</div>
-      <Cubicle />
+      <Blur />
+      <div className="home">
+        <h1 className="welcome">Welcome back, {userData.username}!</h1>
+        <Room hostName={userData.username} />
+        <IconNavBar username={userData.username} />
+      </div>
     </>
   );
 };

@@ -1,33 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import uuid from "react-uuid";
-import cubicleLogo from "../assets/cubicle_logo.png";
-
-import useLocalStorage from "../hooks/useLocalStorage";
-import { fetchValue, saveValue } from "../services/Firebase";
 import { TextField, Button } from "@mui/material";
 
-import "./Login.css";
-import Blur from "./Blur";
+import cubicleLogo from "assets/cubicle_logo.png";
+import { fetchValue, saveValue } from "../services/Firebase";
 
-const validUsername = new RegExp("^[a-zA-Z0-9]+$");
+import "./Login.css";
 
 const Login = () => {
-  const { state } = useLocation();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [usernameError, setUsernameError] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
 
   const handleTogglePage = () => {
     setIsLogin((prevState) => !prevState);
-  };
-
-  const handleUsername = (e) => {
-    setUsername(e.target.value);
-    setUsernameError(!validUsername.test(e.target.value));
   };
 
   const handleSignIn = async () => {
@@ -36,6 +25,7 @@ const Login = () => {
     if (data && data.password.toString() === password) {
       const { userId } = data;
       localStorage.setItem("userData", JSON.stringify({ username, userId }));
+      console.log("login");
       navigate("/", { replace: true });
     }
   };
@@ -54,7 +44,6 @@ const Login = () => {
 
   return (
     <div className="login_container">
-      <Blur />
       <div className="login">
         <h1>Cubicle</h1>
         <div>
@@ -100,22 +89,18 @@ const Login = () => {
               <div>
                 <div className="field_container">
                   <TextField
-                    error={usernameError}
-                    id={usernameError ? "outlined-error" : "outlined-basic"}
-                    label="Username"
+                    id="outlined-basic"
+                    label="New Username"
                     variant="outlined"
                     value={username}
-                    helperText={
-                      usernameError ? "Username must be alphanumeric" : ""
-                    }
-                    onChange={handleUsername}
+                    onChange={(e) => setUsername(e.target.value)}
                   />
                 </div>
 
                 <div className="field_container">
                   <TextField
                     id="outlined-basic"
-                    label="Password"
+                    label="New Password"
                     variant="outlined"
                     type="password"
                     value={password}
@@ -130,11 +115,15 @@ const Login = () => {
                 </div>
               </div>
             )}
-            <div className="button_container">
-              <Button variant="contained" onClick={handleTogglePage}>
-                {isLogin ? "New here? Click me!" : "Have an account?"}
-              </Button>
-            </div>
+            {isLogin ? (
+              <div className="button_container">
+                <Button variant="contained" onClick={handleTogglePage}>
+                  New here? Click me!
+                </Button>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       </div>
