@@ -1,7 +1,7 @@
 import React from "react";
 
 import useLocalStorage from "../hooks/useLocalStorage";
-import Cubicle from "./Cubicle";
+import Room from "./Room";
 import Sidebar from "./Sidebar";
 
 import "./Home.css";
@@ -13,7 +13,9 @@ const Home = () => {
     <div id="home">
       <Sidebar />
       <div>Welcome back, {userData.username}!</div>
-      <Cubicle />
+      <div className="room">
+        <Room />
+      </div>
     </div>
   );
 };
